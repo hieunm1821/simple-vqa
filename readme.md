@@ -10,3 +10,9 @@ ConvNet Architecture:
 
 	  conv		maxpool			conv 		maxpool		  flatten	  fc
 64x64 ---> 64x64x8 ---> 32x32x8 ---> 32x32x16 ---> 16x16x16 ---> 4096 ---> 32
+
+
+TODO:
+- train not run because torch.tensor
+- use Dataloader
+- batchsize
