@@ -2,9 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-
-
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
@@ -20,6 +17,30 @@ class ConvNet(nn.Module):
         x = torch.tanh(self.fc(x))
         return x
 
-net = ConvNet()
-x = torch.rand(1,3,64,64)
-print(net(x))
+class QNet(nn.Module):
+    def __init__(self, vocab_size):
+        super(QNet, self).__init__()
+        self.fc1 = nn.Linear(vocab_size, 32) # vec_size
+        self.fc2 = nn.Linear(32, 32)
+    def forward(self, x):
+        x = torch.tanh(self.fc1(x))
+        x = torch.tanh(self.fc2(x))
+        return x
+
+class MergeNet(nn.Module):
+    def __init__(self, vocab_size, num_ans):
+        super(MergeNet, self).__init__()
+        self.fc1 = nn.Linear(32, 32)
+        self.fc2 = nn.Linear(32, num_ans)
+        self.Conv = ConvNet()
+        self.Q = QNet(vocab_size)
+    def forward(self, image, question):
+        x = torch.mul(self.Conv(image), self.Q(question))
+        x = torch.tanh(self.fc1(x))
+        x = F.softmax(self.fc2(x), dim = 1)
+        return x
+
+# net = MergeNet(26, 13)
+# qn = torch.rand(1,26)
+# im = torch.rand(1,3,64,64)
+# print(net(im,qn))
