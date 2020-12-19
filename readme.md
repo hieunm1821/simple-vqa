@@ -2,7 +2,7 @@
 
 This repository contains Neural network and Demo deploying.
 
-To practice buidling End-to-end AI application. 
+To practice building End-to-end AI application. 
 
 ## Data set: [easy-VQA](https://github.com/vzhou842/easy-VQA)
 
