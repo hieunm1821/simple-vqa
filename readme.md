@@ -19,4 +19,5 @@ To practice buidling End-to-end AI application.
 
 
 ## TODO:
-- add validation phase when training
+- Train model
+- Build demo

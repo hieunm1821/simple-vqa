@@ -70,20 +70,34 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 print("Start training")
 
-for epoch in range(2):
-	running_loss = 0.0
-	for i, data in enumerate(trainloader, 0):
-		image, question, answer = data
+dataset = {"train": trainloader, "val": testloader}
+data_lengths = {"train": len(trainset), "val": len(testset)}
 
-		optimizer.zero_grad()
+for epoch in range(8):
 
-		output = net(image, question)
-		loss = criterion(output, torch.max(answer, 1)[1])
-		loss.backward()
-		optimizer.step()
+	for phase in ["train", "val"]:
+		if phase == "train":
+			net.train(True)
+		else:
+			net.train(False)
+		running_loss = 0.0
+		for i, data in enumerate(dataset[phase], 0):
+			image, question, answer = data
 
-		running_loss += loss.item()
-		if i % 2000 == 1999:
-			print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
-			running_loss = 0.0
+			optimizer.zero_grad()
+
+			output = net(image, question)
+			loss = criterion(output, torch.max(answer, 1)[1])
+			if phase == "train":
+				loss.backward()
+				optimizer.step()
+
+			running_loss += loss.item()
+
+		epoch_loss = running_loss / data_lengths[phase]
+		print('{} loss: {:.4f}'.format(phase, epoch_loss))
 print("Finished training")
+
+PATH = './model.pth'
+torch.save(net.state_dict(), PATH)
+print("Saved model successfully, path: {}".format(PATH))
