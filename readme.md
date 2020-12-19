@@ -19,6 +19,4 @@ To practice buidling End-to-end AI application.
 
 
 ## TODO:
-- train not run because torch.tensor
-- use Dataloader
-- batchsize
+- add validation phase when training
