@@ -84,6 +84,9 @@ for epoch in range(8):
 		for i, data in enumerate(dataset[phase], 0):
 			image, question, answer = data
 
+			image = image.to(device)
+			question = question.to(device)
+			answer = answer.to(device)
 			optimizer.zero_grad()
 
 			output = net(image, question)
@@ -95,6 +98,7 @@ for epoch in range(8):
 			running_loss += loss.item()
 
 		epoch_loss = running_loss / data_lengths[phase]
+    	print("Epoch {}". format(epoch + 1))
 		print('{} loss: {:.4f}'.format(phase, epoch_loss))
 print("Finished training")
 
