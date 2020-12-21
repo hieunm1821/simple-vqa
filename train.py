@@ -66,7 +66,7 @@ print(device)
 net = MergeNet(len(vocab), num_ans)
 net.to(device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=0.0004)
+optimizer = optim.Adam(net.parameters(), lr=0.0005)
 
 print("Start training")
 

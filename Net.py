@@ -11,8 +11,8 @@ class ConvNet(nn.Module):
         self.fc = nn.Linear(16 * 16 * 16, 32)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.pool(self.conv1(x))
+        x = self.pool(self.conv2(x))
         x = x.view(-1, 16 * 16 * 16)
         x = torch.tanh(self.fc(x))
         return x
