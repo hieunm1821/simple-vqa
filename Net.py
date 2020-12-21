@@ -37,7 +37,7 @@ class MergeNet(nn.Module):
     def forward(self, image, question):
         x = torch.mul(self.Conv(image), self.Q(question))
         x = torch.tanh(self.fc1(x))
-        x = F.softmax(self.fc2(x), dim = 1)
+        x = self.fc2(x)
         return x
 
 # net = MergeNet(26, 13)

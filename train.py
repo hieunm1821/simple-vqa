@@ -66,7 +66,7 @@ print(device)
 net = MergeNet(len(vocab), num_ans)
 net.to(device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.Adam(net.parameters(), lr=0.0004)
 
 print("Start training")
 
@@ -74,13 +74,14 @@ dataset = {"train": trainloader, "val": testloader}
 data_lengths = {"train": len(trainset), "val": len(testset)}
 
 for epoch in range(8):
-
+	print("Epoch {}". format(epoch + 1))
 	for phase in ["train", "val"]:
 		if phase == "train":
 			net.train(True)
 		else:
 			net.train(False)
 		running_loss = 0.0
+		running_accuracy = 0
 		for i, data in enumerate(dataset[phase], 0):
 			image, question, answer = data
 
@@ -91,15 +92,19 @@ for epoch in range(8):
 
 			output = net(image, question)
 			loss = criterion(output, torch.max(answer, 1)[1])
+			accuracy = torch.sum(torch.max(answer, 1)[1] == torch.max(output, 1)[1])
 			if phase == "train":
 				loss.backward()
 				optimizer.step()
 
 			running_loss += loss.item()
+			running_accuracy += accuracy.item()
 
 		epoch_loss = running_loss / data_lengths[phase]
-    	print("Epoch {}". format(epoch + 1))
+		epoch_accuracy = running_accuracy / data_lengths[phase]
+		
 		print('{} loss: {:.4f}'.format(phase, epoch_loss))
+		print('{} accuracy: {:.4f}'.format(phase, epoch_accuracy))
 print("Finished training")
 
 PATH = './model.pth'
