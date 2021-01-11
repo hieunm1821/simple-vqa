@@ -1,16 +1,38 @@
-from easy_vqa import get_train_image_paths, get_test_image_paths, get_train_questions, get_test_questions, get_answers
 import torch
 from Net import *
 from word_to_vec import *
 import cv2
 import numpy as np
 import torch.optim as optim
+import json
+import os
 
-all_answers = get_answers()
+with open('data/answers.txt', 'r') as file:
+    all_answers = [a.strip() for a in file]
 num_ans = len(all_answers)
+print('Found {} total answers'.format(num_ans))
 
-train_qs, train_answers, train_image_ids = get_train_questions()
-test_qs, test_answers, test_image_ids = get_test_questions()
+def read_questions(path):
+	with open(path, 'r') as file:
+		qs = json.load(file)
+	texts = [q[0] for q in qs]
+	answers = [q[1] for q in qs]
+	image_ids = [q[2] for q in qs]
+	return (texts, answers, image_ids)
+
+train_qs, train_answers, train_image_ids = read_questions('data/train/questions.json')
+test_qs, test_answers, test_image_ids = read_questions('data/test/questions.json')
+
+print('Read {} training questions and {} testing questions.'.format(len(train_qs), len(test_qs)))
+
+
+def extract_paths(dir):
+	paths = {}
+	for filename in os.listdir(dir):
+		if filename.endswith('.png'):
+			image_id = int(filename[:-4])
+			paths[image_id] = os.path.join(dir, filename)
+	return paths
 
 def load_and_proccess_image(image_path):
     im = cv2.imread(image_path)
@@ -24,8 +46,10 @@ def read_images(paths):
 		ims[image_id] = load_and_proccess_image(image_path)
 	return ims
 
-train_ims = read_images(get_train_image_paths())
-test_ims = read_images(get_test_image_paths())
+train_ims = read_images(extract_paths('data/train/images'))
+test_ims  = read_images(extract_paths('data/test/images'))
+
+print('Read {} training images and {} testing images.'.format(len(train_ims), len(test_ims)))
 
 train_X_ims = torch.stack([train_ims[id] for id in train_image_ids])
 test_X_ims = torch.stack([test_ims[id] for id in test_image_ids])
@@ -49,7 +73,6 @@ testset = []
 
 for i in range(train_X_ims.shape[0]):
     trainset.append([train_X_ims[i], train_X_seqs[i], train_Y[i]])
-
 
 for i in range(test_X_ims.shape[0]):
     testset.append([test_X_ims[i], test_X_seqs[i], test_Y[i]])
